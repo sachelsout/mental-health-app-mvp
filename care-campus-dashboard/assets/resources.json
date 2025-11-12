@@ -1,0 +1,16 @@
+{
+  "Crisis_Resources": {
+    "University_of_Maryland_Police": "(301) 405-3333",
+    "UMPD_Non_Emergency_Number_and_Police_Escort_Service": "(301) 405-3555",
+    "UMD_CARE_to_Stop_Violence_24_Hour_Sexual_Assault_Hotline": "(301) 741-3442",
+    "National_Suicide_and_Crisis_Lifeline": "988",
+    "Trevor_Project_LGBTQ+_Youth_Crisis_Line": "1-866-488-7386"
+  },
+  "Campus_Resources": {
+    "Behavioral_Health_Service_in_the_Health_Center": "(301) 314-8106",
+    "HELP_Center_Peer_to_Peer_Support": "(301) 314-HELP (4357)",
+    "Dean_of_Students_Office": "(301) 314-8484",
+    "Campus_Chaplains": "(301) 314-9893",
+    "Behavioral_and_Threat_Assessment_Team_BETA": "(301) 314-BETA (2382)"
+  }
+}
