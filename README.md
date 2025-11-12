@@ -44,6 +44,80 @@ This MVP is designed to guide students through short lessons, exercises, and ref
 
 ---
 
+## ⚙️ Local Development Setup
+
+Follow these steps to get the app running locally.
+
+### 🧱 Prerequisites
+- **Node.js** ≥ 18  
+- **npm** or **pnpm/yarn**  
+- **Supabase CLI** → install via
+```bash
+npm install supabase --save-dev
+```
+or follow the [Supabase CLI install guide](https://supabase.com/docs/guides/local-development/cli/getting-started)
+
+### 🧩 Quickstart
+
+1. Clone the repository
+```bash
+git clone https://github.com/sachelsout/mental-health-app-mvp.git
+cd mental-health-app-mvp
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Start Supabase locally
+```bash
+npx supabase start
+```
+This runs Postgres, Auth, and Storage locally.
+
+4. Copy environment variables
+```bash
+cp .env.example .env.local
+```
+Then, add the values printed by Supabase (usually `SUPABASE_URL` and `SUPABASE_ANON_KEY`).
+
+5. Run the app
+```bash
+npm run dev
+```
+
+6. (Optional) Create a test user
+You can sign up manually via the app’s sign-up screen or through Supabase Studio → Auth → “Add User”.
+
+### 🧪 Useful Commands
+
+| Command              | Description                    |
+| -------------------- | ------------------------------ |
+| `npx supabase start` | Start local Supabase stack     |
+| `npx supabase stop`  | Stop local Supabase stack      |
+| `npm run dev`        | Run the Next.js frontend       |
+| `npm run test`       | Run basic tests (if available) |
+
+### 🧰 Troubleshooting
+
+- Port already in use? → Run npx supabase stop and try again.
+
+- Env variables not loading? → Ensure you copied .env.example to .env.local.
+
+- Supabase connection errors? → Check your SUPABASE_URL and SUPABASE_ANON_KEY values.
+
+### 🔐 .env.example
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+---
+
 ## 🗂️ Supabase Schema (Concise Reference)  
 ```sql
 users(id uuid pk, email text, campus_id text, goals_json jsonb, consent_accepted_at timestamptz)
