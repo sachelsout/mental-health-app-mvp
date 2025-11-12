@@ -1,0 +1,38 @@
+{
+  "modules": [
+    {
+      "module_title": "Understanding Mental Health",
+      "lessons": [
+        {
+          "lesson_title": "What Is Mental Health?",
+          "questions": ["How would you define mental health in your own words?"]
+        },
+        {
+          "lesson_title": "Common Mental Health Challenges",
+          "questions": ["Can you identify one common sign of stress, anxiety, or depression?"]
+        },
+        {
+          "lesson_title": "Breaking the Stigma",
+          "questions": ["Why do you think people hesitate to talk about mental health issues?"]
+        }
+      ]
+    },
+    {
+      "module_title": "Building Emotional Resilience",
+      "lessons": [
+        {
+          "lesson_title": "Understanding Emotions",
+          "questions": ["What are some healthy ways to express difficult emotions?"]
+        },
+        {
+          "lesson_title": "Coping Strategies and Mindfulness",
+          "questions": ["Which mindfulness technique would you like to try to manage stress?"]
+        },
+        {
+          "lesson_title": "Creating a Personal Wellness Plan",
+          "questions": ["What are three daily habits you can practice to support your mental well-being?"]
+        }
+      ]
+    }
+  ]
+}
