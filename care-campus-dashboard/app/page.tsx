@@ -10,19 +10,9 @@ export default function Home() {
   const [hasConsent, setHasConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check if user has already given consent
-    const consentData = localStorage.getItem('care_campus_consent');
-    if (consentData) {
-      try {
-        const parsed = JSON.parse(consentData);
-        setHasConsent(parsed.accepted === true);
-      } catch (error) {
-        console.error('Error parsing consent data:', error);
-        setHasConsent(false);
-      }
-    } else {
-      setHasConsent(false);
-    }
+    // Check if user has already given consent (sessionStorage)
+    const consentGiven = sessionStorage.getItem('consent_given') === 'true';
+    setHasConsent(consentGiven);
   }, []);
 
   const handleConsentAccepted = () => {
