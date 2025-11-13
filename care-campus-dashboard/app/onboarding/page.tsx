@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 import CampusSelect from './CampusSelect';
 import GoalsChips from './GoalsChips';
 
-export default function OnboardingPageContent() {
+function OnboardingPageContent() {
   const router = useRouter();
   const [campus, setCampus] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
@@ -63,5 +64,13 @@ export default function OnboardingPageContent() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <ProtectedRoute>
+      <OnboardingPageContent />
+    </ProtectedRoute>
   );
 }
