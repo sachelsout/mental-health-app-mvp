@@ -1,16 +1,52 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
+import ConsentScreen from '@/app/components/ConsentScreen';
 
 export default function Home() {
   const router = useRouter();
-  /** Simple homepage with a welcome message(Welcome to the Care Campus Dashboard) 
-   * and an image representing mental health logo(XFoundry Logo.jpeg from public folder)
-   * Include a brief description of the app's purpose and navigation buttons to access different features.
-   * Buttons will include "Go to Learn", "View Resources", and "Chat with Terry the Terp".
-  */
+  const [hasConsent, setHasConsent] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    // Check if user has already given consent
+    const consentData = localStorage.getItem('care_campus_consent');
+    if (consentData) {
+      try {
+        const parsed = JSON.parse(consentData);
+        setHasConsent(parsed.accepted === true);
+      } catch (error) {
+        console.error('Error parsing consent data:', error);
+        setHasConsent(false);
+      }
+    } else {
+      setHasConsent(false);
+    }
+  }, []);
+
+  const handleConsentAccepted = () => {
+    setHasConsent(true);
+  };
+
+  // Show loading state while checking consent
+  if (hasConsent === null) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-zinc-600 dark:text-zinc-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show consent screen if user hasn't accepted
+  if (!hasConsent) {
+    return <ConsentScreen onAccept={handleConsentAccepted} />;
+  }
+
+  // Show main dashboard if consent is given
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto text-center">
@@ -50,5 +86,4 @@ export default function Home() {
       </div>
     </div>
   );
-
 }

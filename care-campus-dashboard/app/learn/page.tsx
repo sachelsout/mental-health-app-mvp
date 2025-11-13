@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import modules from '@/assets/sample_modules.json';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 
 interface Lesson {
   lesson_title: string;
@@ -14,7 +15,7 @@ interface Module {
   lessons: Lesson[];
 }
 
-export default function Learn() {
+function LearnContent() {
   const router = useRouter();
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
 
@@ -83,14 +84,20 @@ export default function Learn() {
                   > 
                     Complete Questions 
                   </button>
-
                 </div>
-                
               ))}
             </div>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function Learn() {
+  return (
+    <ProtectedRoute>
+      <LearnContent />
+    </ProtectedRoute>
   );
 }

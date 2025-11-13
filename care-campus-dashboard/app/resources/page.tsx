@@ -3,7 +3,9 @@
  * Renders resources from `assets/resources.json`.
  * The JSON is structured as an object with sections (e.g. "Crisis_Resources").
  */
+'use client';
 
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 import resources from '@/assets/resources.json';
 
 function humanizeKey(key: string) {
@@ -12,7 +14,7 @@ function humanizeKey(key: string) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default function ResourcesPage() {
+function ResourcesContent() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -44,5 +46,13 @@ export default function ResourcesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResourcesPage() {
+  return (
+    <ProtectedRoute>
+      <ResourcesContent />
+    </ProtectedRoute>
   );
 }

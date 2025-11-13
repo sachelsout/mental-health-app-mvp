@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import modules from '@/assets/sample_modules.json';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 
 interface Lesson {
   lesson_title: string;
   questions: string[];
 }
 
-export default function LessonPage() {
+function LessonContent() {
   const router = useRouter();
   const params = useParams();
   const lessonName = decodeURIComponent(params.lessonName as string);
@@ -116,5 +117,13 @@ export default function LessonPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LessonPage() {
+  return (
+    <ProtectedRoute>
+      <LessonContent />
+    </ProtectedRoute>
   );
 }
