@@ -28,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <header className="w-full bg-transparent">
           <div className="max-w-6xl mx-auto px-4 py-3">
