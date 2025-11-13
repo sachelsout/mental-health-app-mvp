@@ -5,47 +5,34 @@ import { useRouter } from 'next/navigation';
 import CampusSelect from './CampusSelect';
 import GoalsChips from './GoalsChips';
 
-interface OnboardingStepGoals {
-  userId: string; // The authenticated user's ID passed from the Server Component
-}
-
-export default function OnboardingStepGoalsContent({ userId }: OnboardingStepGoals) {
+export default function OnboardingPageContent() {
   const router = useRouter();
   const [campus, setCampus] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
   const [error, setError] = useState<string | null>(null);
 
-  const handleContinue = async () => {
-    if (!userId) {
-        setError("Authentication failed. Please sign in again.");
+  const handleContinue = () => {
+    // Check if user has selected required fields before proceeding
+    if (!campus || goals.length === 0) {
+        setError("Please select a campus and at least one goal to continue.");
         return;
     }
-
+    
+    // START: Simplified Logic to bypass API/Auth
     setLoading(true);
     setError(null);
 
-    try {
-      // Call the new API route to persist data
-      const res = await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, campus_id: campus, goals }),
-      });
+    // Simulate successful completion by setting the session flag
+    sessionStorage.setItem('is_onboarding_complete', 'true');
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to save profile data.');
-      }
-
-      router.push('/'); // Redirect to the home dashboard after onboarding
-    } catch (err) {
-      console.error('Error saving profile:', err);
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
+    // Redirect to the home page, which will now render the Dashboard
+    setTimeout(() => {
+        setLoading(false);
+        router.replace('/'); 
+    }, 500);
+    
+    // END: Simplified Logic
   };
 
   return (

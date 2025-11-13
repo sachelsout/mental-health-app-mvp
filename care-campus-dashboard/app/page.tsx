@@ -7,19 +7,31 @@ import ConsentScreen from '@/app/components/ConsentScreen';
 
 export default function Home() {
   const router = useRouter();
+  // State to track flow status
   const [hasConsent, setHasConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check if user has already given consent (sessionStorage)
+    // Check if user has already given consent on initial load.
     const consentGiven = sessionStorage.getItem('consent_given') === 'true';
     setHasConsent(consentGiven);
   }, []);
 
   const handleConsentAccepted = () => {
+    // 1. Mark consent as accepted locally
+    sessionStorage.setItem('consent_given', 'true');
     setHasConsent(true);
+    
+    // 2. IMMEDIATELY redirect to the dedicated onboarding route.
+    router.replace('/onboarding');
   };
+  
+  // We no longer need handleOnboardingComplete or the isOnboarding state
+  // because the actual Onboarding page at /onboarding will handle setting the flag 
+  // and redirecting to the dashboard (i.e., this home page) when it's done.
 
-  // Show loading state while checking consent
+  // --- RENDERING FLOW ---
+
+  // 1. Show loading state while checking initial consent
   if (hasConsent === null) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
@@ -31,12 +43,23 @@ export default function Home() {
     );
   }
 
-  // Show consent screen if user hasn't accepted
+  // 2. Show consent screen if user hasn't accepted
   if (!hasConsent) {
     return <ConsentScreen onAccept={handleConsentAccepted} />;
   }
 
-  // Show main dashboard if consent is given
+  // 3. Check if onboarding is complete.
+  const onboardingIsComplete = sessionStorage.getItem('is_onboarding_complete') === 'true';
+
+  // 4. Redirect to Onboarding if consent is given but onboarding is NOT complete.
+  if (!onboardingIsComplete) {
+    // This handles users who navigate directly to / or refresh the page after consent
+    // but before completing onboarding.
+    router.replace('/onboarding');
+    return null; // Return nothing while redirecting
+  }
+  
+  // 5. Show main dashboard only if consent is given AND onboarding is complete.
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto text-center">
