@@ -1,4 +1,5 @@
-// utils/consent.ts
+// app/utils/consent.ts
+import { supabase } from '@/lib/supabaseClient';
 
 export interface ConsentData {
   accepted: boolean;
@@ -6,21 +7,57 @@ export interface ConsentData {
   version: string;
 }
 
-const CONSENT_STORAGE_KEY = 'care_campus_consent';
 const CURRENT_CONSENT_VERSION = '1.0';
 
 /**
- * Check if user has given consent
+ * Generate or retrieve session ID
+ */
+function getSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  
+  let sessionId = sessionStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionStorage.setItem('session_id', sessionId);
+  }
+  return sessionId;
+}
+
+/**
+ * Check if user has given consent (from sessionStorage for quick check)
  */
 export function hasUserConsent(): boolean {
   if (typeof window === 'undefined') return false;
+  return sessionStorage.getItem('consent_given') === 'true';
+}
+
+/**
+ * Check consent from Supabase (async verification)
+ */
+export async function checkConsentInDatabase(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
   
   try {
-    const consentData = localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!consentData) return false;
+    const sessionId = getSessionId();
     
-    const parsed: ConsentData = JSON.parse(consentData);
-    return parsed.accepted === true && parsed.version === CURRENT_CONSENT_VERSION;
+    const { data, error } = await supabase
+      .from('consent_events')
+      .select('accepted')
+      .eq('session_id', sessionId)
+      .eq('accepted', true)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    
+    if (error) throw error;
+    
+    const hasConsent = data && data.length > 0;
+    
+    // Sync with sessionStorage
+    if (hasConsent) {
+      sessionStorage.setItem('consent_given', 'true');
+    }
+    
+    return hasConsent;
   } catch (error) {
     console.error('Error checking consent:', error);
     return false;
@@ -30,16 +67,19 @@ export function hasUserConsent(): boolean {
 /**
  * Store user consent
  */
-export function storeConsent(): void {
+export async function storeConsent(): Promise<void> {
   if (typeof window === 'undefined') return;
   
-  const consentData: ConsentData = {
-    accepted: true,
-    timestamp: new Date().toISOString(),
-    version: CURRENT_CONSENT_VERSION
-  };
+  const sessionId = getSessionId();
   
-  localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consentData));
+  await supabase.from('consent_events').insert({
+    session_id: sessionId,
+    accepted: true,
+    version: CURRENT_CONSENT_VERSION,
+    user_agent: navigator.userAgent
+  });
+  
+  sessionStorage.setItem('consent_given', 'true');
 }
 
 /**
@@ -47,23 +87,8 @@ export function storeConsent(): void {
  */
 export function clearConsent(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(CONSENT_STORAGE_KEY);
-}
-
-/**
- * Get consent data
- */
-export function getConsentData(): ConsentData | null {
-  if (typeof window === 'undefined') return null;
-  
-  try {
-    const consentData = localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!consentData) return null;
-    return JSON.parse(consentData);
-  } catch (error) {
-    console.error('Error getting consent data:', error);
-    return null;
-  }
+  sessionStorage.removeItem('consent_given');
+  sessionStorage.removeItem('session_id');
 }
 
 /**

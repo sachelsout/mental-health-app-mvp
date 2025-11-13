@@ -1,24 +1,57 @@
 'use client';
 
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 interface ConsentScreenProps {
   onAccept: () => void;
 }
 
+// Generate a unique session ID for tracking
+function getOrCreateSessionId() {
+  // Try to get from sessionStorage first (cleared when browser closes)
+  let sessionId = sessionStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionStorage.setItem('session_id', sessionId);
+  }
+  return sessionId;
+}
+
 export default function ConsentScreen({ onAccept }: ConsentScreenProps) {
   const [accepted, setAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (accepted) {
-      // Store consent in localStorage
-      const consentData = {
-        accepted: true,
-        timestamp: new Date().toISOString(),
-        version: '1.0' // Track consent version for future updates
-      };
-      localStorage.setItem('care_campus_consent', JSON.stringify(consentData));
-      onAccept();
+      setIsLoading(true);
+      
+      try {
+        const sessionId = getOrCreateSessionId();
+        
+        // Save directly to Supabase
+        const { error } = await supabase.from('consent_events').insert({
+          session_id: sessionId,
+          accepted: true,
+          version: '1.0',
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null
+        });
+        
+        if (error) {
+          console.error('Error saving consent:', error);
+          throw error;
+        }
+        
+        // Mark consent as given in sessionStorage
+        sessionStorage.setItem('consent_given', 'true');
+        
+        onAccept();
+      } catch (error) {
+        console.error('Failed to save consent:', error);
+        alert('Failed to save consent. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -144,18 +177,19 @@ export default function ConsentScreen({ onAccept }: ConsentScreenProps) {
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleAccept}
-              disabled={!accepted}
+              disabled={!accepted || isLoading}
               className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
-                accepted
+                accepted && !isLoading
                   ? 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
                   : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-500 cursor-not-allowed'
               }`}
             >
-              Accept and Continue
+              {isLoading ? 'Saving...' : 'Accept and Continue'}
             </button>
             <button
               onClick={handleDecline}
-              className="flex-1 px-6 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700 font-semibold transition-colors"
+              disabled={isLoading}
+              className="flex-1 px-6 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700 font-semibold transition-colors disabled:opacity-50"
             >
               Decline
             </button>
