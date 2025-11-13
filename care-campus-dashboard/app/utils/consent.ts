@@ -1,5 +1,5 @@
 // app/utils/consent.ts
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface ConsentData {
   accepted: boolean;
