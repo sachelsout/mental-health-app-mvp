@@ -156,4 +156,7 @@ If you or someone you know is in crisis, please reach out to your local helpline
 Questions for Team Feedback:
 - What type of information should we collect on the users?
 - How should we display information on user progress(modules completed, current status, etc.)?
+- What features from the HowWeFeel app do we want?
+- How are we going to make it TAILORED for college students?
+- How do we differentiate our app from other educatinal apps?
 - Any feeback on display?
