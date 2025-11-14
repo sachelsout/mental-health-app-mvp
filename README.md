@@ -152,3 +152,8 @@ If you or someone you know is in crisis, please reach out to your local helpline
 - Offline sync & caching
 
 - Voice-based check-ins
+
+Questions for Team Feedback:
+- What type of information should we collect on the users?
+- How should we display information on user progress(modules completed, current status, etc.)?
+- Any feeback on display?
