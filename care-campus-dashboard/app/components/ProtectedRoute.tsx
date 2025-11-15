@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { hasUserConsent } from '@/app/utils/consent';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,25 +10,29 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkConsent = () => {
-      const hasConsent = hasUserConsent();
-      
-      if (!hasConsent) {
-        // Redirect to home page which will show consent screen
-        router.push('/');
-      } else {
-        setIsAuthorized(true);
+    const checkAuthorization = () => {
+      if (authLoading) return;
+
+      // First check: Is user authenticated?
+      if (!user) {
+        router.push('/signin');
+        return;
       }
+
+      // User is authenticated, allow access
+      // The home page will handle consent/onboarding checks
+      setIsAuthorized(true);
     };
 
-    checkConsent();
-  }, [router]);
+    checkAuthorization();
+  }, [user, authLoading, router]);
 
   // Show loading state while checking
-  if (isAuthorized === null) {
+  if (authLoading || isAuthorized === null) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
         <div className="text-center">

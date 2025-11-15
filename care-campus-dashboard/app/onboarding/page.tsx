@@ -2,38 +2,57 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
 import CampusSelect from './CampusSelect';
 import GoalsChips from './GoalsChips';
 
 function OnboardingPageContent() {
   const router = useRouter();
+  const { user } = useAuth();
   const [campus, setCampus] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState<string | null>(null);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     // Check if user has selected required fields before proceeding
     if (!campus || goals.length === 0) {
         setError("Please select a campus and at least one goal to continue.");
         return;
     }
+
+    if (!user) {
+        setError("User not authenticated.");
+        return;
+    }
     
-    // START: Simplified Logic to bypass API/Auth
     setLoading(true);
     setError(null);
 
-    // Simulate successful completion by setting the session flag
-    sessionStorage.setItem('is_onboarding_complete', 'true');
+    try {
+      // Save onboarding data to Supabase users table
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ 
+          campus_id: campus,
+          goals_json: goals
+        })
+        .eq('id', user.id);
 
-    // Redirect to the home page, which will now render the Dashboard
-    setTimeout(() => {
-        setLoading(false);
-        router.replace('/'); 
-    }, 500);
-    
-    // END: Simplified Logic
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Redirect to home page (dashboard)
+      router.push('/');
+    } catch (err: any) {
+      console.error('Error saving onboarding data:', err);
+      setError(err.message || "Failed to save onboarding data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

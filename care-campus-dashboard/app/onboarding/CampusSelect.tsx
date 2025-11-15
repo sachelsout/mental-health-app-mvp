@@ -1,11 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-interface CampusOption {
-    id: string;
-    name: string;
-}
+import { CAMPUSES, CampusOption } from '@/app/utils/campusUtils';
 
 interface CampusSelectProps {
     value: string;
@@ -13,15 +9,9 @@ interface CampusSelectProps {
 }
 
 export default function CampusSelect({ value, onChange }: CampusSelectProps) {
-    const campuses: CampusOption[] = [
-        {id: 'campus_umd', name: 'University of Maryland-College Park'},
-        {id: 'campus_umbc', name: 'University of Maryland-Baltimore County'},
-        {id: 'campus_gt', name: 'Georgia Tech'},
-    ];
-
     const [isOpen, setIsOpen] = useState(false);
 
-    const selectedCampus = campuses.find((c) => c.id === value);
+    const selectedCampus = CAMPUSES.find((c) => c.id === value);
 
     return (
         <div className="w-full max-w-md mx-auto">
@@ -57,7 +47,7 @@ export default function CampusSelect({ value, onChange }: CampusSelectProps) {
 
             {isOpen && (
             <ul className="absolute z-10 mt-2 w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {campuses.map((campus) => (
+                {CAMPUSES.map((campus) => (
                 <li
                     key={campus.id}
                     onClick={() => {

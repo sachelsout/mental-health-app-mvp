@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Image from 'next/image';
-import Link from 'next/link';
 import "./globals.css";
+import { AuthProvider } from "./contexts/AuthContext";
+import HeaderContent from "@/app/components/HeaderContent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,22 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <header className="w-full bg-transparent">
-          <div className="max-w-6xl mx-auto px-4 py-3">
-            <Link href="/" className="inline-flex items-center gap-3">
-              <Image
-                src="/XFoundry Logo.jpeg"
-                alt="Home"
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
-              <span className="text-sm font-medium text-black dark:text-zinc-50">Home</span>
-            </Link>
-          </div>
-        </header>
-
-        <main className="pt-4">{children}</main>
+        <AuthProvider>
+          <HeaderContent />
+          <main className="pt-4">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );
