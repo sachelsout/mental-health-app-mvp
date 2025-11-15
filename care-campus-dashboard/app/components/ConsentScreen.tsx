@@ -1,21 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 
 interface ConsentScreenProps {
   onAccept: () => void;
-}
-
-// Generate a unique session ID for tracking
-function getOrCreateSessionId() {
-  // Try to get from sessionStorage first (cleared when browser closes)
-  let sessionId = sessionStorage.getItem('session_id');
-  if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem('session_id', sessionId);
-  }
-  return sessionId;
 }
 
 export default function ConsentScreen({ onAccept }: ConsentScreenProps) {
@@ -27,29 +15,11 @@ export default function ConsentScreen({ onAccept }: ConsentScreenProps) {
       setIsLoading(true);
       
       try {
-        const sessionId = getOrCreateSessionId();
-        
-        // Save directly to Supabase
-        const { error } = await supabase.from('consent_events').insert({
-          session_id: sessionId,
-          accepted: true,
-          version: '1.0',
-          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null
-        });
-        
-        if (error) {
-          console.error('Error saving consent:', error);
-          throw error;
-        }
-        
-        // Mark consent as given in sessionStorage
-        sessionStorage.setItem('consent_given', 'true');
-        
-        onAccept();
+        // Call parent's onAccept - parent handles saving to database
+        await onAccept();
       } catch (error) {
         console.error('Failed to save consent:', error);
         alert('Failed to save consent. Please try again.');
-      } finally {
         setIsLoading(false);
       }
     }

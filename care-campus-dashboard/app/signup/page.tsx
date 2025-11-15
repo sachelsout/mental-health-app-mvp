@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,20 +19,31 @@ export default function SignInPage() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
+    // Validation
+    if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
     setLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
+    const { error: signUpError } = await signUp(email, password);
 
-    if (signInError) {
-      setError('Invalid email or password');
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
     } else {
-      // Successfully signed in, redirect to home
+      // Successfully signed up, redirect to home (will show consent)
       router.push('/');
     }
   };
@@ -42,10 +54,10 @@ export default function SignInPage() {
         <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-black dark:text-zinc-50 mb-2">
-              Welcome Back
+              Create Account
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Sign in to continue your journey
+              Join Care Campus to start your mental health journey
             </p>
           </div>
 
@@ -86,7 +98,25 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="At least 6 characters"
+                className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-black dark:text-zinc-50 mb-2"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter your password"
                 className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={loading}
               />
@@ -97,18 +127,18 @@ export default function SignInPage() {
               disabled={loading}
               className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <Link
-                href="/signup"
+                href="/signin"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
-                Sign Up
+                Sign In
               </Link>
             </p>
           </div>
